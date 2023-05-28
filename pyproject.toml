@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "test-result-app-backend"
+version = "0.1.0"
+description = ""
+authors = ["Hennadii Kochev"]
+readme = "README.md"
+packages = [{include = "test_result_app_backend"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+flask = "^2.3.2"
+sqlalchemy = "^2.0.15"
+alembic = "^1.11.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
