@@ -11,6 +11,7 @@ python = "^3.10"
 flask = "^2.3.2"
 sqlalchemy = "^2.0.15"
 alembic = "^1.11.1"
+fpdf2 = "^2.7.4"
 
 
 [build-system]
