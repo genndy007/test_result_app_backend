@@ -58,7 +58,7 @@ class TestRunReportPDF(ReportPDF):
 
             self.pdf.ln()
 
-        self.pdf.ln(5)
+        self.pdf.ln(3)
 
     def build_test_cases_list_heading(self):
         self.pdf.set_font(*Font.GENERAL_HEADING)
@@ -83,9 +83,21 @@ class TestRunReportPDF(ReportPDF):
         row(Font.GENERAL_HEADING, Color.HEADING, headings)
         row(Font.MEDIUM_TEXT, Color.WHITE, contents)
 
+    def build_test_case_index(self, idx):
+        self.pdf.set_font(*Font.GENERAL_HEADING)
+        self.pdf.set_fill_color(*Color.WHITE)
+        self.pdf.cell(self.pdf.epw, Font.HEADING_FONT_SIZE, f'{idx}', align='C', fill=True)
+        self.pdf.ln()
+
+    def build_test_cases(self):
+        for idx, test_case in enumerate(self.data['test_cases'], 1):
+            self.build_test_case_index(idx)
+            self.build_one_test_case(test_case)
+
 
     def build_pdf(self):
         self.build_report_heading()
         self.build_title()
         self.build_test_cases_list_heading()
         self.build_one_test_case(self.data['test_cases'][0])
+        # self.build_test_cases()
