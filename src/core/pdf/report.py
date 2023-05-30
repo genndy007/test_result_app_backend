@@ -38,7 +38,7 @@ class TestRunReportPDF(ReportPDF):
 
         row1 = {
             'Test Suite': self.data['test_suite']['name'],
-            'Had been run at': self.data['timestamp'],
+            'Date': self.data['timestamp'],
         }
         row2 = {
             'About suite': self.data['test_suite']['description'],
@@ -58,8 +58,18 @@ class TestRunReportPDF(ReportPDF):
 
             self.pdf.ln()
 
+        self.pdf.ln(5)
 
+    def build_test_cases_heading(self):
+        self.pdf.set_font(*Font.GENERAL_HEADING)
+        self.pdf.set_fill_color(*Color.WHITE)
+        self.pdf.cell(self.pdf.epw, Font.HEADING_FONT_SIZE, 'Test Cases List', align='C', fill=True)
+        self.pdf.ln()
+
+    def build_one_test_case(self, test_case):
+        pass
 
     def build_pdf(self):
         self.build_report_heading()
         self.build_title()
+        self.build_test_cases_heading()
