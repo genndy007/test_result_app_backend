@@ -60,16 +60,32 @@ class TestRunReportPDF(ReportPDF):
 
         self.pdf.ln(5)
 
-    def build_test_cases_heading(self):
+    def build_test_cases_list_heading(self):
         self.pdf.set_font(*Font.GENERAL_HEADING)
         self.pdf.set_fill_color(*Color.WHITE)
         self.pdf.cell(self.pdf.epw, Font.HEADING_FONT_SIZE, 'Test Cases List', align='C', fill=True)
         self.pdf.ln()
 
     def build_one_test_case(self, test_case):
-        pass
+        proportions = [0.2, 0.6, 0.2]
+        headings = ['Case Name', 'Case Description', 'Status']
+        contents = [test_case[key] for key in ['name', 'description', 'status']]
+        contents[-1] = STATUS_MAPPING.get(contents[-1], 'Unknown')
+
+        def row(font, color, sentences):
+            self.pdf.set_font(*font)
+            self.pdf.set_fill_color(*color)
+            for sentence in sentences:
+                width = proportions[sentences.index(sentence)]
+                self.pdf.cell(self.pdf.epw * width, Font.MEDIUM_FONT_SIZE, sentence, align='C', fill=True)
+            self.pdf.ln()
+
+        row(Font.GENERAL_HEADING, Color.HEADING, headings)
+        row(Font.MEDIUM_TEXT, Color.WHITE, contents)
+
 
     def build_pdf(self):
         self.build_report_heading()
         self.build_title()
-        self.build_test_cases_heading()
+        self.build_test_cases_list_heading()
+        self.build_one_test_case(self.data['test_cases'][0])
