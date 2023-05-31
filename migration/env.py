@@ -23,6 +23,7 @@ if config.config_file_name is not None:
 
 from src.models import Base
 import src.models.user
+import src.models.test_case
 
 target_metadata = Base.metadata
 
