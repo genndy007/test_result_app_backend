@@ -13,6 +13,7 @@ sqlalchemy = "^2.0.15"
 alembic = "^1.11.1"
 fpdf2 = "^2.7.4"
 psycopg2 = "^2.9.6"
+gunicorn = "^20.1.0"
 
 
 [build-system]
