@@ -1,4 +1,4 @@
-from fpdf import FPDF
+from fpdf import FPDF, YPos
 
 from src.core.pdf.common import FONT_FAMILY, Font, Color
 from src.core.pdf.mapping import STATUS_MAPPING
@@ -69,8 +69,9 @@ class TestRunReportPDF(ReportPDF):
     def build_test_case_index(self, idx):
         self.pdf.set_font(*Font.GENERAL_HEADING)
         self.pdf.set_fill_color(*Color.WHITE)
-        self.pdf.cell(self.pdf.epw, Font.HEADING_FONT_SIZE, f'{idx}', align='C', fill=True)
+        self.pdf.cell(self.pdf.epw, Font.HEADING_FONT_SIZE, f'{idx}', align='C', border=1, fill=True)
         self.pdf.ln()
+        self.pdf.ln(1)
 
     def build_test_case_name_status(self, test_case):
         proportions = [0.2, 0.6, 0.2]
@@ -90,7 +91,29 @@ class TestRunReportPDF(ReportPDF):
         row(Font.MEDIUM_TEXT, Color.WHITE, contents)
 
     def build_test_case_conditions_steps(self, test_case):
-        pass
+        headings = ['Pre-Conditions', 'Test Steps', 'Post-Conditions']
+        lines = []
+        for test_step in test_case['test_steps']:
+            line = f'{test_step["order"]}. {test_step["content"]}'
+            lines.append(line)
+
+        test_step_text = '\n'.join(lines)
+        contents = [test_case['precondition'], test_step_text, test_case['postcondition']]
+
+        self.pdf.set_font(*Font.GENERAL_HEADING)
+        self.pdf.set_fill_color(*Color.WHITE)
+        for heading in headings:
+            self.pdf.cell(self.pdf.epw / len(headings), Font.MEDIUM_FONT_SIZE, heading, align='C', fill=True)
+        self.pdf.ln()
+        self.pdf.ln(1)
+
+        self.pdf.set_font(*Font.MEDIUM_TEXT)
+        for content in contents:
+            self.pdf.multi_cell(self.pdf.epw / len(contents), Font.MEDIUM_FONT_SIZE, content, align='C', fill=True, new_y=YPos.TOP)
+
+        for _ in lines:
+            self.pdf.ln()
+            self.pdf.ln(5)
 
     def build_one_test_case(self, idx, test_case):
         self.build_test_case_index(idx)
@@ -105,5 +128,4 @@ class TestRunReportPDF(ReportPDF):
         self.build_report_heading()
         self.build_test_suite_info()
         self.build_test_cases_list_heading()
-        # self.build_one_test_case(self.data['test_cases'][0])
         self.build_test_cases()
