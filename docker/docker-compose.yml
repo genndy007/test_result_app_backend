@@ -1,0 +1,21 @@
+version: '3.9'
+
+# postgresql://postgres:postgres@localhost:5439/test_result_app_db
+
+services:
+  pg:
+    image: postgres:15.3
+    container_name: test_result_app_postgres
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "test_result_app_db"
+    ports:
+      - "5439:5432"
+    volumes:
+      - test_result_app_pg_data:/var/lib/postgresql/data
+    restart: always
+
+
+volumes:
+  test_result_app_pg_data:
