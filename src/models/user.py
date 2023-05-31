@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 from src.models import Base
 
@@ -10,6 +11,8 @@ class Project(Base):
     user_id = Column(Integer, ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'), index=True, nullable=False)
     name = Column(String)
     description = Column(String)
+
+    user = relationship('User', uselist=False)
 
 
 class User(Base):
