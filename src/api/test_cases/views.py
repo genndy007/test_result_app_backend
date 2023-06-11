@@ -42,4 +42,4 @@ def list_my():
         }
         test_cases_list.append(test_case_item)
 
-    return make_response({'test_cases': test_cases_list}, 200)
+    return make_response({'test_cases': test_cases_list}, HTTPStatus.OK)
