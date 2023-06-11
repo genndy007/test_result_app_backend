@@ -67,15 +67,16 @@ def login():
     password = body.get('password')
 
     if not username or not password:
-        return make_response({'message': 'Fields `username`, `password` are required!'}, 400)
+        return message_response('Fields `username`, `password` are required!', 400)
 
     user = DBSession.query(User).filter(User.username == username).first()
     if not user:
-        return make_response({'message': f'Username `{username}` not exists'}, 401)
+        return message_response(f'Username `{username}` does not exist', 401)
 
     if check_password_hash(user.password_hash, password):
         token = generate_jwt_token(user)
-        response = make_response({'message': f'Welcome, {user.full_name}! Authenticated with username `{username}`'}, 200)
+        welcome_message = f'Welcome, {user.full_name}! Authenticated with username `{username}`'
+        response = message_response(welcome_message, 200)
         response.set_cookie('jwt', token)
         return response
-    return make_response({'message': ''})
+    return message_response(f'Wrong password', 401)
