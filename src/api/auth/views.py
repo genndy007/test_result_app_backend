@@ -1,4 +1,5 @@
 import datetime
+from http import HTTPStatus
 
 from flask import request, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -17,7 +18,7 @@ def db():
     with engine.connect() as conn:
         results = conn.execute(text('select version()'))
         version = ''.join([str(row[0]) for row in results])
-    return message_response(f'Timestamp: {now}; version: {version}', 200)
+    return message_response(f'Timestamp: {now}; version: {version}', HTTPStatus.OK)
 
 
 @auth.route('/signup', methods=['POST'])
@@ -34,7 +35,7 @@ def signup():
 
     existing_user = DBSession.query(User).filter(User.username == username).first()
     if existing_user:
-        return message_response('User already exists!', 202)
+        return message_response('User already exists!', HTTPStatus.ACCEPTED)
 
     user = User(
         username=username,
@@ -56,7 +57,7 @@ def signup():
 
     user.active_project_id = project.id
     DBSession.commit()
-    return message_response('Successfully registered!', 201)
+    return message_response('Successfully registered!', HTTPStatus.CREATED)
 
 
 @auth.route('/login', methods=['POST'])
@@ -67,26 +68,26 @@ def login():
     password = body.get('password')
 
     if not username or not password:
-        return message_response('Fields `username`, `password` are required!', 400)
+        return message_response('Fields `username`, `password` are required!', HTTPStatus.BAD_REQUEST)
 
     user = DBSession.query(User).filter(User.username == username).first()
     if not user:
-        return message_response(f'Username `{username}` does not exist', 401)
+        return message_response(f'Username `{username}` does not exist', HTTPStatus.UNAUTHORIZED)
 
     if check_password_hash(user.password_hash, password):
         token = generate_jwt_token(user)
         welcome_message = f'Welcome, {user.full_name}! Authenticated with username `{username}`'
-        response = message_response(welcome_message, 200)
+        response = message_response(welcome_message, HTTPStatus.OK)
         response.set_cookie('jwt', token)
         return response
-    return message_response(f'Wrong password', 401)
+    return message_response(f'Wrong password', HTTPStatus.UNAUTHORIZED)
 
 
 @auth.route('/me', methods=['GET'])
 def me():
     payload = authenticate_jwt(request)
     if not payload:
-        return message_response('Authenticate at /auth/login first', 403)
+        return message_response('Authenticate at /auth/login first', HTTPStatus.FORBIDDEN)
 
     user_id = payload['id']
     user = DBSession.query(User).filter(User.id == user_id).first()
@@ -101,15 +102,15 @@ def me():
         }
     }
 
-    return make_response({'user': user_info}, 200)
+    return make_response({'user': user_info}, HTTPStatus.OK)
 
 
 @auth.route('/logout', methods=['POST'])
 def logout():
     payload = authenticate_jwt(request)
     if not payload:
-        return message_response('Authenticate at /auth/login first', 403)
+        return message_response('Authenticate at /auth/login first', HTTPStatus.FORBIDDEN)
 
-    response = message_response('Logged out', 200)
+    response = message_response('Logged out', HTTPStatus.OK)
     response.delete_cookie('jwt')
     return response
