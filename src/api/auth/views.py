@@ -7,9 +7,9 @@ from sqlalchemy import text
 
 from src.models import DBSession, engine
 from src.models.user import User, Project
+from src.security.jwt import generate_jwt_token, authenticate_jwt
 from src.utils import message_response
 from . import auth
-from .jwt import generate_jwt_token, authenticate_jwt
 
 
 @auth.route('/db', methods=['GET'])
