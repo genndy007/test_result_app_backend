@@ -102,3 +102,14 @@ def me():
     }
 
     return make_response({'user': user_info}, 200)
+
+
+@auth.route('/logout', methods=['POST'])
+def logout():
+    payload = authenticate_jwt(request)
+    if not payload:
+        return message_response('Authenticate at /auth/login first', 403)
+
+    response = message_response('Logged out', 200)
+    response.delete_cookie('jwt')
+    return response
