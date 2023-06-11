@@ -1,14 +1,21 @@
+import datetime
+
 from flask import request, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import text
 
 from . import auth
-from src.models import DBSession
+from src.models import DBSession, engine
 from src.models.user import User, Project
 
 
-@auth.route('/ping', methods=['GET'])
-def ping():
-    return make_response({'message': 'Pong!'}, 200)
+@auth.route('/db', methods=['GET'])
+def db():
+    now = datetime.datetime.now()
+    with engine.connect() as conn:
+        results = conn.execute(text('select version()'))
+        version = ''.join([str(row[0]) for row in results])
+    return make_response({'message': f'Timestamp: {now}; version: {version}'}, 200)
 
 
 @auth.route('/signup', methods=['POST'])
