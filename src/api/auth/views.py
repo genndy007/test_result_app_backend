@@ -8,7 +8,7 @@ from src.models import DBSession, engine
 from src.models.user import User, Project
 from src.utils import message_response
 from . import auth
-from .jwt import generate_jwt_token
+from .jwt import generate_jwt_token, authenticate_jwt
 
 
 @auth.route('/db', methods=['GET'])
@@ -80,3 +80,25 @@ def login():
         response.set_cookie('jwt', token)
         return response
     return message_response(f'Wrong password', 401)
+
+
+@auth.route('/me', methods=['GET'])
+def me():
+    payload = authenticate_jwt(request)
+    if not payload:
+        return message_response('Authenticate at /auth/login first', 403)
+
+    user_id = payload['id']
+    user = DBSession.query(User).filter(User.id == user_id).first()
+    project = DBSession.query(Project).filter(Project.id == user.active_project_id).first()
+    user_info = {
+        'id': user_id,
+        'full_name': user.full_name,
+        'username': user.username,
+        'active_project': {
+            'name': project.name,
+            'description': project.description,
+        }
+    }
+
+    return make_response({'user': user_info}, 200)
