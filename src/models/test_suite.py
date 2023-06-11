@@ -32,4 +32,14 @@ class TestRun(Base):
     test_suite_id = Column(Integer, ForeignKey('test_suite.id', onupdate='CASCADE', ondelete='CASCADE'), index=True, nullable=False)
     result = Column(String)
 
-    # add relationship
+    test_suite = relationship('TestSuite', uselist=False)
+
+
+class TestCaseTestRun(Base):
+    __tablename__ = 'test_case_test_run'
+
+    id = Column(Integer, primary_key=True)
+    test_run_id = Column(Integer, ForeignKey('test_run.id', onupdate='CASCADE', ondelete='CASCADE'), index=True, nullable=False)
+    test_case_id = Column(Integer, ForeignKey('test_case.id', onupdate='CASCADE', ondelete='CASCADE'), index=True, nullable=False)
+
+    status = Column(String)
