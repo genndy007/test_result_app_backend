@@ -5,8 +5,9 @@ from sqlalchemy.orm import selectinload
 
 from src.api.auth.utils import get_current_user
 from src.models import DBSession
-from src.models.test_case import TestCase
+from src.models.test_case import TestCase, TestStep
 from src.utils import message_response
+from .validate import validate_test_steps
 from . import test_cases
 
 
@@ -44,4 +45,41 @@ def list_my():
 
 @test_cases.route('/new', methods=['POST'])
 def new():
-    pass
+    user = get_current_user(request)
+    if not user:
+        return message_response('Authenticate at /auth/login first', HTTPStatus.FORBIDDEN)
+
+    name = request.json.get('name')
+    description = request.json.get('description')
+    precondition = request.json.get('precondition')
+    postcondition = request.json.get('postcondition')
+    test_steps = request.json.get('test_steps')
+
+    if not all([name, description, precondition, postcondition, test_steps]):
+        msg = 'Required fields: name,description,precondition,postcondition,test_steps'
+        return message_response(msg, HTTPStatus.BAD_REQUEST)
+
+    if not validate_test_steps(test_steps):
+        return message_response('Each test_step must contain content,order', HTTPStatus.BAD_REQUEST)
+
+    test_case = TestCase(
+        project_id=user.active_project_id,
+        name=str(name),
+        description=str(description),
+        precondition=str(precondition),
+        postcondition=str(postcondition)
+    )
+    DBSession.add(test_case)
+    DBSession.commit()
+
+    for test_step in test_steps:
+        new_test_step = TestStep(
+            test_case_id=test_case.id,
+            content=str(test_step['content']),
+            order=int(test_step['order']),
+        )
+        DBSession.add(new_test_step)
+    DBSession.commit()
+
+    return message_response(f'Successfully added new TestCase with id {test_case.id}', HTTPStatus.CREATED)
+

@@ -3,7 +3,7 @@ from src.models.user import User
 from src.security.jwt import authenticate_jwt
 
 
-def get_current_user(request):
+def get_current_user(request) -> User | None:
     payload = authenticate_jwt(request)
     if not payload:
         return
