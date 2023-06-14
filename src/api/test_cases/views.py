@@ -83,3 +83,22 @@ def new():
 
     return message_response(f'Successfully added new TestCase with id {test_case.id}', HTTPStatus.CREATED)
 
+
+# todo: no validation if test case exists
+@test_cases.route('/delete', methods=['DELETE'])
+def delete_by_id():
+    user = get_current_user(request)
+    if not user:
+        return message_response('Authenticate at /auth/login first', HTTPStatus.FORBIDDEN)
+
+    test_case_id = request.args.get('id')
+    if not test_case_id:
+        return message_response('Required query param `id`', HTTPStatus.BAD_REQUEST)
+
+    DBSession.query(TestCase)\
+        .filter(TestCase.project_id == user.active_project_id)\
+        .filter(TestCase.id == test_case_id)\
+        .delete()
+    DBSession.commit()
+
+    return message_response(f'Successfully deleted TestCase with id {test_case_id}', HTTPStatus.NO_CONTENT)
