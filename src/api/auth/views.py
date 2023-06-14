@@ -9,6 +9,7 @@ from src.models import DBSession, engine
 from src.models.user import User, Project
 from src.security.jwt import generate_jwt_token, authenticate_jwt
 from src.utils import message_response
+from .utils import get_current_user
 from . import auth
 
 
@@ -85,15 +86,13 @@ def login():
 
 @auth.route('/me', methods=['GET'])
 def me():
-    payload = authenticate_jwt(request)
-    if not payload:
+    user = get_current_user(request)
+    if not user:
         return message_response('Authenticate at /auth/login first', HTTPStatus.FORBIDDEN)
 
-    user_id = payload['id']
-    user = DBSession.query(User).filter(User.id == user_id).first()
     project = DBSession.query(Project).filter(Project.id == user.active_project_id).first()
     user_info = {
-        'id': user_id,
+        'id': user.id,
         'full_name': user.full_name,
         'username': user.username,
         'active_project': {
