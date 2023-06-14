@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship
 
 from src.models import Base
@@ -31,6 +31,7 @@ class TestRun(Base):
     id = Column(Integer, primary_key=True)
     test_suite_id = Column(Integer, ForeignKey('test_suite.id', onupdate='CASCADE', ondelete='CASCADE'), index=True, nullable=False)
     result = Column(String)
+    created = Column(DateTime, server_default=func.now())
 
     test_suite = relationship('TestSuite', uselist=False)
 
