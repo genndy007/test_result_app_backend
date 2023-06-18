@@ -43,3 +43,40 @@ def list_my():
         test_suites_list.append(test_suite_dict)
 
     return make_response({'test_suites': test_suites_list}, HTTPStatus.OK)
+
+
+@test_suites.route('/new', methods=['POST'])
+def new():
+    user = get_current_user(request)
+    if not user:
+        return message_response('Authenticate at /auth/login first', HTTPStatus.FORBIDDEN)
+
+    name = request.json.get('name')
+    description = request.json.get('description')
+    test_case_ids = request.json.get('test_case_ids')
+
+    if not all([name, description, test_case_ids]):
+        msg = 'Required fields: name,description,test_case_ids'
+        return message_response(msg, HTTPStatus.BAD_REQUEST)
+
+    test_suite = TestSuite(
+        project_id=user.active_project_id,
+        name=name,
+        description=description,
+    )
+    DBSession.add(test_suite)
+    DBSession.commit()
+
+    order = 1
+    for test_case_id in test_case_ids:
+        test_case_test_suite = TestCaseTestSuite(
+            test_case_id=test_case_id,
+            test_suite_id=test_suite.id,
+            order=order,
+        )
+        DBSession.add(test_case_test_suite)
+        order += 1
+    DBSession.commit()
+
+    return message_response(f'Successfully created test suite with id `{test_suite.id}`', HTTPStatus.CREATED)
+
