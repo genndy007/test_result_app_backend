@@ -1,6 +1,6 @@
 STATUS_MAPPING = {
     "success": "Successful",
-    "fail": "Failure",
+    "failure": "Failure",
     "retest": "Re-test again",
     "default": "Unknown",
 }

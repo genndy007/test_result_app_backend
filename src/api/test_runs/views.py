@@ -11,6 +11,7 @@ from src.models.test_suite import TestRun, TestCaseTestRun, TestSuite
 from src.utils import message_response
 from .db import get_test_run_by_id
 from . import test_runs
+from src.core.pdf.report import TestRunReportPDF
 
 
 @test_runs.route('/list_my', methods=['GET'])
@@ -31,9 +32,14 @@ def list_my():
     return make_response({'test_runs': test_runs_list}, HTTPStatus.OK)
 
 
-
 @test_runs.route('/<int:test_run_id>/report', methods=['GET'])
 def id_report(test_run_id):
-    test_run_dict = get_test_run_by_id(test_run_id)
+    user = get_current_user(request)
+    if not user:
+        return message_response('Authenticate at /auth/login first', HTTPStatus.FORBIDDEN)
 
-    return make_response({'test_run': test_run_dict}, HTTPStatus.OK)
+    test_run_dict = get_test_run_by_id(test_run_id)
+    reports_dir = '/home/hennadii/KPI/Diplom/test_result_app_backend/tmp/reports'
+    report_path = TestRunReportPDF(reports_dir, test_run_dict).make()
+
+    return make_response({'report_path': report_path}, HTTPStatus.OK)

@@ -12,7 +12,7 @@ def get_test_run_by_id(test_run_id):
     test_run_dict = {
         'id': test_run.id,
         'result': test_run.result,
-        'timestamp': test_run.created.strftime('%Y-%m-%d %H:%M:%S'),
+        'timestamp': test_run.created.strftime('%Y-%m-%d %H-%M-%S'),
         'test_suite': {
             'name': test_suite_qs.name,
             'description': test_suite_qs.description,

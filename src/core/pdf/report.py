@@ -5,25 +5,41 @@ from src.core.pdf.mapping import STATUS_MAPPING
 
 
 class ReportPDF:
-    def __init__(self, file_name, data):
-        self.file_name = file_name
+    def __init__(self, reports_dir, data, file_name=None):
         self.data = data
+        self.reports_dir = reports_dir
+        self.set_file_name(file_name)
         self.pdf = FPDF()
 
     def prepare(self):
         self.pdf.set_line_width(1 / 10 ** 5)
 
+    def set_file_name(self, file_name):
+        self.file_name = file_name
+
     def build_pdf(self):
         pass
 
     def make(self):
+        full_path = self.reports_dir + '/' + self.file_name
         self.prepare()
         self.pdf.add_page()
         self.build_pdf()
-        self.pdf.output(self.file_name)
+        self.pdf.output(full_path)
+        return full_path
 
 
 class TestRunReportPDF(ReportPDF):
+
+    def set_file_name(self, file_name):
+        if file_name:
+            self.file_name = str(file_name)
+            if not self.file_name.endswith('.pdf'):
+                self.file_name += '.pdf'
+        else:
+            suite_name = self.data['test_suite']['name']
+            timestamp = self.data['timestamp']
+            self.file_name = f'Run_{suite_name}_at_{timestamp}.pdf'
 
     def build_report_heading(self):
         self.pdf.set_font(*Font.REPORT_HEADING)
