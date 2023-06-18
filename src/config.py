@@ -13,6 +13,7 @@ class Config:
     POSTGRES_HOST = os.environ.get('POSTGRES_HOST')
     POSTGRES_PORT = os.environ.get('POSTGRES_PORT')
     POSTGRES_DB = os.environ.get('POSTGRES_DB')
+    FILESTACK_API_KEY = os.environ.get('FILESTACK_API_KEY')
 
 
 SQLALCHEMY_DATABASE_URI = f'postgresql://{Config.POSTGRES_USER}:{Config.POSTGRES_PASSWORD}@{Config.POSTGRES_HOST}:{Config.POSTGRES_PORT}/{Config.POSTGRES_DB}'

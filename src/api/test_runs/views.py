@@ -12,6 +12,7 @@ from src.utils import message_response
 from .db import get_test_run_by_id
 from . import test_runs
 from src.core.pdf.report import TestRunReportPDF
+from ...core.pdf.upload import SingletonFilestack
 
 
 @test_runs.route('/list_my', methods=['GET'])
@@ -42,4 +43,6 @@ def id_report(test_run_id):
     reports_dir = '/home/hennadii/KPI/Diplom/test_result_app_backend/tmp/reports'
     report_path = TestRunReportPDF(reports_dir, test_run_dict).make()
 
-    return make_response({'report_path': report_path}, HTTPStatus.OK)
+    report_url = SingletonFilestack().upload_pdf(report_path)
+
+    return make_response({'report_url': report_url}, HTTPStatus.OK)
