@@ -12,7 +12,6 @@ from src.utils import message_response
 from . import test_runs
 
 
-# todo: test steps left to load into response
 @test_runs.route('/list_my', methods=['GET'])
 def list_my():
     user = get_current_user(request)
@@ -41,16 +40,26 @@ def list_my():
         test_cases_ids_results = DBSession.query(TestCaseTestRun.test_case_id, TestCaseTestRun.status)\
             .filter(TestCaseTestRun.test_run_id == test_run.id).all()
         for test_case_id_result in test_cases_ids_results:
-            test_case_details = DBSession.query(TestCase).filter(TestCase.id == test_case_id_result[0]).first()
+            test_case_id, test_case_result = test_case_id_result
+            test_case_details = DBSession.query(TestCase).filter(TestCase.id == test_case_id).first()
             test_case_dict = {
-                'id': test_case_id_result[0],
+                'id': test_case_id,
                 'name': test_case_details.name,
                 'description': test_case_details.description,
-                'status': test_case_id_result[1],
+                'status': test_case_result,
                 'precondition': test_case_details.precondition,
                 'postcondition': test_case_details.postcondition,
                 'test_steps': []
             }
+
+            test_steps_qs = DBSession.query(TestStep).filter(TestStep.test_case_id == test_case_id).order_by(TestStep.order)
+            for test_step in test_steps_qs:
+                test_step_dict = {
+                    'content': test_step.content,
+                    'order': test_step.order,
+                }
+                test_case_dict['test_steps'].append(test_step_dict)
+
             test_run_dict['test_cases'].append(test_case_dict)
 
         test_runs_list.append(test_run_dict)
