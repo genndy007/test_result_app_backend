@@ -76,5 +76,22 @@ def set_active():
     return message_response(f'Successfully set active project with id `{project_id}` to user `{user.full_name}`', HTTPStatus.ACCEPTED)
 
 
+@projects.route('/delete', methods=['DELETE'])
+def delete():
+    user = get_current_user(request)
+    if not user:
+        return message_response('Authenticate at /auth/login first', HTTPStatus.FORBIDDEN)
+
+    project_id = request.args.get('id')
+    if not project_id:
+        return message_response('Required query param `id`', HTTPStatus.BAD_REQUEST)
+
+    DBSession.query(Project)\
+        .filter(Project.user_id == user.id)\
+        .filter(Project.id == project_id)\
+        .delete()
+    DBSession.commit()
+
+    return message_response(f'Successfully deleted Project with id {project_id}', HTTPStatus.NO_CONTENT)
 
 
