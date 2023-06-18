@@ -80,6 +80,7 @@ def new():
 
     return message_response(f'Successfully created test suite with id `{test_suite.id}`', HTTPStatus.CREATED)
 
+
 # todo: no validation if test suite exists
 @test_suites.route('/delete', methods=['DELETE'])
 def delete():

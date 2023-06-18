@@ -1,0 +1,31 @@
+from http import HTTPStatus
+
+from flask import request, make_response
+
+from src.api.auth.utils import get_current_user
+from src.models import DBSession
+from src.models.user import Project
+from src.utils import message_response
+from . import projects
+
+
+@projects.route('/list_my', methods=['GET'])
+def list_my():
+    user = get_current_user(request)
+    if not user:
+        return message_response('Authenticate at /auth/login first', HTTPStatus.FORBIDDEN)
+
+    projects_list = []
+    projects_qs = DBSession.query(Project).filter(Project.user_id == user.id)
+    for project in projects_qs:
+        is_active = project.id == user.active_project_id
+        project_dict = {
+            'id': project.id,
+            'name': project.name,
+            'description': project.description,
+            'is_active': is_active,
+        }
+        projects_list.append(project_dict)
+
+    return make_response({'projects': projects_list}, HTTPStatus.OK)
+
