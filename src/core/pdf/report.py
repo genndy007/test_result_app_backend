@@ -1,11 +1,12 @@
 from fpdf import FPDF, YPos
 
-from src.core.pdf.common import FONT_FAMILY, Font, Color
+from src.config import Config
+from src.core.pdf.common import Font, Color
 from src.core.pdf.mapping import STATUS_MAPPING
 
 
 class ReportPDF:
-    def __init__(self, reports_dir, data, file_name=None):
+    def __init__(self, data, reports_dir=Config.REPORTS_DIR, file_name=None):
         self.data = data
         self.reports_dir = reports_dir
         self.set_file_name(file_name)

@@ -40,9 +40,7 @@ def id_report(test_run_id):
         return message_response('Authenticate at /auth/login first', HTTPStatus.FORBIDDEN)
 
     test_run_dict = get_test_run_by_id(test_run_id)
-    reports_dir = '/home/hennadii/KPI/Diplom/test_result_app_backend/tmp/reports'
-    report_path = TestRunReportPDF(reports_dir, test_run_dict).make()
-
+    report_path = TestRunReportPDF(test_run_dict).make()
     report_url = SingletonFilestack().upload_pdf(report_path)
 
     return make_response({'report_url': report_url}, HTTPStatus.OK)
