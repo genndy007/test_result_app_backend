@@ -29,3 +29,30 @@ def list_my():
 
     return make_response({'projects': projects_list}, HTTPStatus.OK)
 
+
+@projects.route('/new', methods=['POST'])
+def new():
+    user = get_current_user(request)
+    if not user:
+        return message_response('Authenticate at /auth/login first', HTTPStatus.FORBIDDEN)
+
+    name = request.json.get('name')
+    description = request.json.get('description')
+
+    if not all([name, description]):
+        msg = 'Required fields: name,description'
+        return message_response(msg, HTTPStatus.BAD_REQUEST)
+
+    project = Project(
+        user_id=user.id,
+        name=name,
+        description=description,
+    )
+    DBSession.add(project)
+    DBSession.commit()
+
+    return message_response(f'Successfully created project with id `{project.id}`', HTTPStatus.CREATED)
+
+
+
+
