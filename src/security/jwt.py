@@ -18,7 +18,10 @@ def generate_jwt_token(user):
 def authenticate_jwt(request):
     token = request.cookies.get('jwt')
     if not token:
-        return
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return
+        token = auth_header.split()[1]
 
     try:
         payload = jwt.decode(token, Config.SECRET_KEY, algorithms=['HS256'])

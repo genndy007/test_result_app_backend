@@ -78,7 +78,11 @@ def login():
     if check_password_hash(user.password_hash, password):
         token = generate_jwt_token(user)
         welcome_message = f'Welcome, {user.full_name}! Authenticated with username `{username}`'
-        response = message_response(welcome_message, HTTPStatus.OK)
+        json_body = {
+            'jwt': token,
+            'msg': welcome_message,
+        }
+        response = make_response(json_body, HTTPStatus.OK)
         response.set_cookie('jwt', token)
         return response
     return message_response(f'Wrong password', HTTPStatus.UNAUTHORIZED)
