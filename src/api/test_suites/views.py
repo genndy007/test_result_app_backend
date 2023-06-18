@@ -80,3 +80,21 @@ def new():
 
     return message_response(f'Successfully created test suite with id `{test_suite.id}`', HTTPStatus.CREATED)
 
+# todo: no validation if test suite exists
+@test_suites.route('/delete', methods=['DELETE'])
+def delete():
+    user = get_current_user(request)
+    if not user:
+        return message_response('Authenticate at /auth/login first', HTTPStatus.FORBIDDEN)
+
+    test_suite_id = request.args.get('id')
+    if not test_suite_id:
+        return message_response('Required query param `id`', HTTPStatus.BAD_REQUEST)
+
+    DBSession.query(TestSuite)\
+        .filter(TestSuite.project_id == user.active_project_id)\
+        .filter(TestSuite.id == test_suite_id)\
+        .delete()
+    DBSession.commit()
+
+    return message_response(f'Successfully deleted TestSuite with id {test_suite_id}', HTTPStatus.NO_CONTENT)
