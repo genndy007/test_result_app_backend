@@ -54,7 +54,7 @@ def new():
     return message_response(f'Successfully created project with id `{project.id}`', HTTPStatus.CREATED)
 
 
-@projects.route('/set_active', methods=['PUT'])
+@projects.route('/set_active', methods=['POST'])
 def set_active():
     user = get_current_user(request)
     if not user:
